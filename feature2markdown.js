@@ -88,7 +88,7 @@ function convertFeatureToMarkdown(featurePath, badgeServiceUrl) {
   }
 
   const markdown = pretty(gherkinDocument, 'markdown');
-  const outPath = featurePath.replace(/\.feature/, '.feature.md');
+  const outPath = featurePath.replace(/\.feature/, '.generated.md');
   fs.writeFileSync(outPath, markdown);
   console.log(`Converted and stored as: ${outPath}`);
 }

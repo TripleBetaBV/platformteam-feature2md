@@ -29,7 +29,9 @@ function findMarkdownFiles(dir) {
 function replaceFeatureReferences(filePath) {
     let content = fs.readFileSync(filePath, 'utf8');
     // Replace any string ending with .feature (not already .feature.md or .feature.yml)
-    const replaced = content.replace(/(\S+?\.feature)(?!\.(?:md|yml)\b)/g, '$1.md');
+    const replaced = content.replace(/(\S+?\.feature)(?!\.(?:md)\b)/g, (match) => {
+        return match.replace(/\.feature$/, '.generated.md');
+    });
     if (replaced !== content) {
         fs.writeFileSync(filePath, replaced, 'utf8');
         console.log(`Updated: ${filePath}`);
