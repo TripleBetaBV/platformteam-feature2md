@@ -1,0 +1,22 @@
+{
+  "name": "gherkin-to-markdown-pipeline",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "feature2markdown.js",
+  "scripts": {
+    "test": "node --experimental-vm-modules node_modules/.bin/jest",
+    "test:watch": "node --experimental-vm-modules node_modules/.bin/jest --watch",
+    "test:coverage": "node --experimental-vm-modules node_modules/.bin/jest --coverage"
+  },
+  "dependencies": {
+    "@cucumber/gherkin": "^33.0.0",
+    "@cucumber/gherkin-utils": "^9.2.0",
+    "@cucumber/messages": "^28.0.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}

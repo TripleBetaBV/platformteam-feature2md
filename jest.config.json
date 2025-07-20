@@ -1,0 +1,15 @@
+{
+  "testEnvironment": "node",
+  "transform": {},
+  "testMatch": [
+    "**/__tests__/**/*.js",
+    "**/?(*.)+(spec|test).js"
+  ],
+  "collectCoverageFrom": [
+    "*.js",
+    "!node_modules/**",
+    "!jest.config.json"
+  ],
+  "moduleFileExtensions": ["js"],
+  "testTimeout": 10000
+}

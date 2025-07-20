@@ -1,0 +1,23 @@
+{
+    // The following will hide the js and map files in the editor
+    "files.exclude": {
+        "**/node_modules": true,
+        "**/dist-types": true,
+        "**/dist": true,
+        "**/coverage": true,
+        "*.code-workspace": true,
+        "yarn.lock": true,
+        "**/.yarn": true,
+    },
+    "jest.jestCommandLine": "yarn test",
+    // In a large repo like the Backstage main repo you likely want to disable
+    // watch mode and the initial test run too, leaving just manual and perhaps
+    // on-save test runs in place.
+    "jest.autoRun": {
+      "watch": false,
+      "onSave": "test-src-file"
+    },
+    "yaml.schemas": {
+      "https://www.schemastore.org/app-config.json": "file:///home/henk/backstage/bs2/examples/add-component-microservice/template.yaml"
+    }
+}
