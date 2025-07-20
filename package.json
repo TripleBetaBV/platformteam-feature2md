@@ -1,9 +1,9 @@
 {
-  "name": "gherkin-to-markdown-pipeline",
+  "name": "@triplebetabv/feature2markdown",
   "version": "1.0.0",
   "description": "",
   "license": "ISC",
-  "author": "",
+  "author": "TripleBetaBV",
   "type": "module",
   "main": "feature2markdown.js",
   "scripts": {
@@ -18,5 +18,8 @@
   },
   "devDependencies": {
     "jest": "^29.7.0"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
   }
 }
