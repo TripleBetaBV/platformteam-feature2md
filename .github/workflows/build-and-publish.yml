@@ -44,7 +44,7 @@ jobs:
       run: |
         echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" > ~/.npmrc
         echo "registry=https://npm.pkg.github.com/TripleBetaBV" >> ~/.npmrc
-        env:
+      env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Prepare package for publishing
