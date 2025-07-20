@@ -1,4 +1,4 @@
-name: Test
+name: Buid and publish
 
 on:
   push:
@@ -38,3 +38,24 @@ jobs:
       uses: codecov/codecov-action@v3
       with:
         fail_ci_if_error: false
+
+    - name: Set up npm authentication for GitHub Packages
+      if: matrix.node-version == '20.x'
+      run: |
+        echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" > ~/.npmrc
+        echo "registry=https://npm.pkg.github.com/TripleBetaBV" >> ~/.npmrc
+        env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Prepare package for publishing
+      if: matrix.node-version == '20.x'
+      run: |
+        mkdir -p dist
+        cp feature2markdown.js dist/
+        cp fix-feature-reference.js dist/
+
+    - name: Publish to GitHub Packages
+      if: matrix.node-version == '20.x'
+      run: npm publish --access=public
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
