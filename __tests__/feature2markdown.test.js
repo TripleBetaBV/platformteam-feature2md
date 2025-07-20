@@ -160,7 +160,7 @@ describe('feature2markdown.js', () => {
       
       convertFeatureToMarkdown(featureFile, badgeServiceUrl);
 
-      const outputFile = path.join(tempDir, 'test.feature.md');
+      const outputFile = path.join(tempDir, 'test.generated.md');
       expect(fs.existsSync(outputFile)).toBe(true);
 
       const outputContent = fs.readFileSync(outputFile, 'utf8');
@@ -187,7 +187,7 @@ describe('feature2markdown.js', () => {
       
       convertFeatureToMarkdown(featureFile, badgeServiceUrl);
 
-      const outputFile = path.join(tempDir, 'rule-test.feature.md');
+      const outputFile = path.join(tempDir, 'rule-test.generated.md');
       expect(fs.existsSync(outputFile)).toBe(true);
 
       const outputContent = fs.readFileSync(outputFile, 'utf8');
@@ -207,7 +207,7 @@ describe('feature2markdown.js', () => {
 
       convertFeatureToMarkdown(featureFile, 'https://example.com');
 
-      const expectedOutputFile = path.join(tempDir, 'simple.feature.md');
+      const expectedOutputFile = path.join(tempDir, 'simple.generated.md');
       expect(fs.existsSync(expectedOutputFile)).toBe(true);
     });
 
@@ -226,7 +226,7 @@ describe('feature2markdown.js', () => {
 
       convertFeatureToMarkdown(featureFile, null);
 
-      const outputFile = path.join(tempDir, 'nobadge.feature.md');
+      const outputFile = path.join(tempDir, 'nobadge.generated.md');
       expect(fs.existsSync(outputFile)).toBe(true);
 
       const outputContent = fs.readFileSync(outputFile, 'utf8');
@@ -257,7 +257,7 @@ describe('feature2markdown.js', () => {
 
       convertFeatureToMarkdown(tempFeatureFile, badgeServiceUrl);
 
-      const outputFile = path.join(tempDir, 'Managing.feature.md');
+      const outputFile = path.join(tempDir, 'Managing.generated.md');
       expect(fs.existsSync(outputFile)).toBe(true);
 
       const outputContent = fs.readFileSync(outputFile, 'utf8');

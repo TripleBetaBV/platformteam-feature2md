@@ -105,7 +105,7 @@ describe('fix-feature-references.js', () => {
   });
 
   describe('replaceFeatureReferences', () => {
-    test('should replace .feature references with .feature.md', () => {
+    test('should replace .feature references with .generated.md', () => {
       const content = `# Test Documentation
 
 This links to [login.feature](features/login.feature) for authentication.
@@ -114,9 +114,9 @@ Also see signup.feature and admin.feature for more details.`;
 
       const expectedContent = `# Test Documentation
 
-This links to [login.feature.md](features/login.feature.md) for authentication.
+This links to [login.generated.md](features/login.generated.md) for authentication.
 
-Also see signup.feature.md and admin.feature.md for more details.`;
+Also see signup.generated.md and admin.generated.md for more details.`;
 
       const testFile = path.join(tempDir, 'test.md');
       fs.writeFileSync(testFile, content);
@@ -127,10 +127,10 @@ Also see signup.feature.md and admin.feature.md for more details.`;
       expect(result).toBe(expectedContent);
     });
 
-    test('should not replace .feature.md references (already converted)', () => {
+    test('should not replace .generated.md references (already converted)', () => {
       const content = `# Test Documentation
 
-This already links to login.feature.md and signup.feature.md.`;
+This already links to login.generated.md and signup.generated.md.`;
 
       const testFile = path.join(tempDir, 'test.md');
       fs.writeFileSync(testFile, content);
@@ -145,12 +145,12 @@ This already links to login.feature.md and signup.feature.md.`;
       const content = `# Test Documentation
 
 This links to config.feature.yml which should not be changed.
-But this login.feature should be changed to login.feature.md.`;
+But this login.feature should be changed to login.generated.md.`;
 
       const expectedContent = `# Test Documentation
 
 This links to config.feature.yml which should not be changed.
-But this login.feature.md should be changed to login.feature.md.`;
+But this login.generated.md should be changed to login.generated.md.`;
 
       const testFile = path.join(tempDir, 'test.md');
       fs.writeFileSync(testFile, content);
@@ -163,7 +163,7 @@ But this login.feature.md should be changed to login.feature.md.`;
 
     test('should handle multiple .feature references on the same line', () => {
       const content = `See login.feature and signup.feature and admin.feature`;
-      const expectedContent = `See login.feature.md and signup.feature.md and admin.feature.md`;
+      const expectedContent = `See login.generated.md and signup.generated.md and admin.generated.md`;
 
       const testFile = path.join(tempDir, 'test.md');
       fs.writeFileSync(testFile, content);
@@ -186,12 +186,12 @@ But this login.feature.md should be changed to login.feature.md.`;
 
       const expectedContent = `# Feature References
 
-- [Login Feature](./features/login.feature.md)
-- Check out user-management.feature.md
-- See path/to/complex-feature-name.feature.md
-- Also nested/deep/folder/test.feature.md
-- URL: https://example.com/docs/api.feature.md
-- File: ../parent/folder/feature.feature.md`;
+- [Login Feature](./features/login.generated.md)
+- Check out user-management.generated.md
+- See path/to/complex-feature-name.generated.md
+- Also nested/deep/folder/test.generated.md
+- URL: https://example.com/docs/api.generated.md
+- File: ../parent/folder/feature.generated.md`;
 
       const testFile = path.join(tempDir, 'test.md');
       fs.writeFileSync(testFile, content);
@@ -240,9 +240,9 @@ docs: "See user-guide.feature for details"`;
 
       const expectedContent = `# YAML Configuration
 features:
-  - login.feature.md
-  - signup.feature.md
-docs: "See user-guide.feature.md for details"`;
+  - login.generated.md
+  - signup.generated.md
+docs: "See user-guide.generated.md for details"`;
 
       const testFile = path.join(tempDir, 'config.yml');
       fs.writeFileSync(testFile, content);
@@ -336,16 +336,16 @@ features:
 
       // Check results
       const updatedReadme = fs.readFileSync(path.join(tempDir, 'README.md'), 'utf8');
-      expect(updatedReadme).toContain('login.feature.md');
-      expect(updatedReadme).toContain('signup.feature.md');
+      expect(updatedReadme).toContain('login.generated.md');
+      expect(updatedReadme).toContain('signup.generated.md');
 
       const updatedDocs = fs.readFileSync(path.join(docsDir, 'guide.md'), 'utf8');
-      expect(updatedDocs).toContain('admin.feature.md');
-      expect(updatedDocs).toContain('user-management.feature.md');
+      expect(updatedDocs).toContain('admin.generated.md');
+      expect(updatedDocs).toContain('user-management.generated.md');
 
       const updatedConfig = fs.readFileSync(path.join(featuresDir, 'config.yml'), 'utf8');
-      expect(updatedConfig).toContain('login.feature.md');
-      expect(updatedConfig).toContain('admin.feature.md');
+      expect(updatedConfig).toContain('login.generated.md');
+      expect(updatedConfig).toContain('admin.generated.md');
     });
 
     test('should handle edge case with mixed file types', () => {
@@ -366,9 +366,9 @@ ref: test.feature`;
       allFiles.forEach(replaceFeatureReferences);
 
       // All should be updated
-      expect(fs.readFileSync(path.join(tempDir, 'test.md'), 'utf8')).toContain('test.feature.md');
-      expect(fs.readFileSync(path.join(tempDir, 'test.yaml'), 'utf8')).toContain('test.feature.md');
-      expect(fs.readFileSync(path.join(tempDir, 'test.yml'), 'utf8')).toContain('test.feature.md');
+      expect(fs.readFileSync(path.join(tempDir, 'test.md'), 'utf8')).toContain('test.generated.md');
+      expect(fs.readFileSync(path.join(tempDir, 'test.yaml'), 'utf8')).toContain('test.generated.md');
+      expect(fs.readFileSync(path.join(tempDir, 'test.yml'), 'utf8')).toContain('test.generated.md');
     });
   });
 });
