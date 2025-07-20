@@ -52,7 +52,7 @@ jobs:
       run: |
         mkdir -p dist
         cp feature2markdown.js dist/
-        cp fix-feature-reference.js dist/
+        cp fix-feature-references.js dist/
 
     - name: Publish to GitHub Packages
       if: matrix.node-version == '20.x'
