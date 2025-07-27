@@ -32,14 +32,19 @@ function findFeatureFiles(dir) {
 // Generate a tag for the badge, containing the name of the feature and scenario
 function getBadgeTag(featureName, scenarioName)
 {
-  if (!scenarioName) {
-    return `<div class="badge" data-feature="${featureName}"></div>`;
+  if (!featureName) {
+    console.warn('Feature name is required for badge generation.');
+    return '';
   }
-  return `<div class="badge" data-feature="${featureName}" data-scenario="${scenarioName}"></div>`;
+
+  if (!scenarioName) {
+    return `<div class="bdd-badge" data-feature="${featureName}"></div>`;
+  }
+  return `<div class="bdd-badge" data-feature="${featureName}" data-scenario="${scenarioName}"></div>`;
 }
 
 // Zet een feature-bestand om naar Markdown met badges
-function convertFeatureToMarkdown(featurePath, badgeServiceUrl) {
+function convertFeatureToMarkdown(featurePath) {
   console.log(`Processing: ${featurePath}`);
   const featureText = fs.readFileSync(featurePath, 'utf8');
   const uuidFn = IdGenerator.uuid();
@@ -100,7 +105,7 @@ function main() {
 }
 
 // Export functions for testing
-export { findFeatureFiles, getBadgeMarkdown, convertFeatureToMarkdown, validateArgs, main };
+export { findFeatureFiles, getBadgeTag, convertFeatureToMarkdown, validateArgs, main };
 
 // Run main function only if this file is executed directly
 if (import.meta.url === `file://${process.argv[1]}`) {
