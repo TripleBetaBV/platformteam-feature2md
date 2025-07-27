@@ -29,31 +29,13 @@ function findFeatureFiles(dir) {
   return results;
 }
 
-// Generate a badge URL in Markdown format
-function getBadgeMarkdown(badgeServiceUrl, featureName, scenarioName) {
-  if (!badgeServiceUrl) {
-    console.warn('Badge service URL is not provided. Skipping badge generation.');
-    return '';
-  }
-
-  if (!featureName) {
-    console.warn('Feature name is not provided. Skipping badge generation.');
-    return '';
-  }
-
+// Generate a tag for the badge, containing the name of the feature and scenario
+function getBadgeTag(featureName, scenarioName)
+{
   if (!scenarioName) {
-    console.warn('Scenario name is not provided. Skipping badge generation.');
-    return '';
+    return `<div class="badge" data-feature="${featureName}"></div>`;
   }
-
-  // Trim any leading or trailing slashes from the URL
-  // Replace special characters and spaces in feature and scenario names
-  // to create a URL-friendly format
-  // Note: This is a simple normalization, you might want to adjust it based on your badge service requirements
-  const normalizedBadgeServiceUrl = badgeServiceUrl.replace(/\/$/, '');
-  const normalizedFeatureName = featureName.trim().replace(/[^a-zA-Z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '').toLowerCase();
-  const normalizedScenarioName = scenarioName.trim().replace(/[^a-zA-Z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '').toLowerCase();
-  return ` ![badge](${normalizedBadgeServiceUrl}/${normalizedFeatureName}/${normalizedScenarioName})`;
+  return `<div class="badge" data-feature="${featureName}" data-scenario="${scenarioName}"></div>`;
 }
 
 // Zet een feature-bestand om naar Markdown met badges
@@ -74,7 +56,7 @@ function convertFeatureToMarkdown(featurePath, badgeServiceUrl) {
     if (child.rule) {
       for (const scenario of child.rule.children) {
         console.log(`Adding badge to scenario: ${scenario.scenario.name}`);
-        const badge = getBadgeMarkdown(badgeServiceUrl, gherkinDocument.feature.name, scenario.scenario.name);
+        const badge = getBadgeTag(gherkinDocument.feature.name);
         scenario.scenario.name += badge;
       }
     }
@@ -82,7 +64,7 @@ function convertFeatureToMarkdown(featurePath, badgeServiceUrl) {
     // Scenario directly under feature
     if (child.scenario) {
       console.log(`Adding badge to scenario: ${child.scenario.name}`);
-      const badge = getBadgeMarkdown(badgeServiceUrl, gherkinDocument.feature.name, child.scenario.name);
+      const badge = getBadgeTag(gherkinDocument.feature.name, child.scenario.name);
       child.scenario.name += badge;
     }
   }
