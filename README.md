@@ -10,7 +10,7 @@ and will replace it with a reference to its corresponding .feature.md file.
 
 It will add a special tag at the end of each feature or scenario title:
 ```html
-<div class="bdd-badge" data-feature="Name of feature" data-scenario="Scenario name"></div>
+<span class="bdd-badge" data-feature="Name of feature" data-scenario="Scenario name"></span>
 ```
 The Bdd Techdocs addon will detect these tags and replaces them with a badge to show the current status of the test, using the latest Azure Devops test result. 
 

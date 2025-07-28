@@ -38,9 +38,9 @@ function getBadgeTag(featureName, scenarioName)
   }
 
   if (!scenarioName) {
-    return `<div class="bdd-badge" data-feature="${featureName}"></div>`;
+    return `<span class="bdd-badge" data-feature="${featureName}"></span>`;
   }
-  return `<div class="bdd-badge" data-feature="${featureName}" data-scenario="${scenarioName}"></div>`;
+  return `<span class="bdd-badge" data-feature="${featureName}" data-scenario="${scenarioName}"></span>`;
 }
 
 // Zet een feature-bestand om naar Markdown met badges

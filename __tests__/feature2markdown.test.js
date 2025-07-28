@@ -78,7 +78,7 @@ describe('feature2markdown.js', () => {
 
       const result = getBadgeTag(featureName);
       
-      expect(result).toBe(' <div class="bdd-badge" data-feature="My Feature"></div>');
+      expect(result).toBe(' <span class="bdd-badge" data-feature="My Feature"></span>');
     });
 
     test('should generate correct badge tag for scenario', () => {
@@ -87,7 +87,7 @@ describe('feature2markdown.js', () => {
 
       const result = getBadgeTag(featureName, scenarioName);
       
-      expect(result).toBe(' <div class="bdd-badge" data-feature="My Feature" data-scenario="My Scenario"></div>');
+      expect(result).toBe(' <span class="bdd-badge" data-feature="My Feature" data-scenario="My Scenario"></span>');
     });
 
     test('should handle special characters in names', () => {
@@ -96,7 +96,7 @@ describe('feature2markdown.js', () => {
 
       const result = getBadgeTag(featureName, scenarioName);
       
-      expect(result).toBe(' <div class="bdd-badge" data-feature="My Feature! @#$%^&*()" data-scenario="Test Scenario: With Special Characters"></div>');
+      expect(result).toBe(' <span class="bdd-badge" data-feature="My Feature! @#$%^&*()" data-scenario="Test Scenario: With Special Characters"></span>');
     });
 
     test('should remove trailing slash from badge service URL', () => {
@@ -105,7 +105,7 @@ describe('feature2markdown.js', () => {
 
       const result = getBadgeTag(featureName, scenarioName);
       
-      expect(result).toBe(' <div class="bdd-badge" data-feature="Feature" data-scenario="Scenario"></div>');
+      expect(result).toBe(' <span class="bdd-badge" data-feature="Feature" data-scenario="Scenario"></span>');
     });
 
     test('should return empty string when feature name is not provided', () => {
@@ -143,7 +143,7 @@ describe('feature2markdown.js', () => {
       const outputContent = fs.readFileSync(outputFile, 'utf8');
       expect(outputContent).toContain('# Feature: Test Feature');
       expect(outputContent).toContain('Test Scenario');
-      expect(outputContent).toContain('<div class="bdd-badge" data-feature="Test Feature" data-scenario="Test Scenario"></div>');
+      expect(outputContent).toContain('<span class="bdd-badge" data-feature="Test Feature" data-scenario="Test Scenario"></span>');
     });
 
     test('should handle feature with rules', () => {
@@ -169,7 +169,7 @@ describe('feature2markdown.js', () => {
       expect(outputContent).toContain('Feature with Rules');
       expect(outputContent).toContain('Business Rule');
       expect(outputContent).toContain('Scenario under rule');
-      expect(outputContent).toContain('<div class="bdd-badge" data-feature="Feature with Rules" data-scenario="Scenario under rule"></div>');
+      expect(outputContent).toContain('<span class="bdd-badge" data-feature="Feature with Rules" data-scenario="Scenario under rule"></span>');
     });
 
     test('should create output file with correct name', () => {
@@ -207,7 +207,7 @@ describe('feature2markdown.js', () => {
       const outputContent = fs.readFileSync(outputFile, 'utf8');
       expect(outputContent).toContain('# Feature: No Badge Test');
       expect(outputContent).toContain('Test without badge');
-      expect(outputContent).not.toContain('<div class="bdd-badge" data-feature="No Badge Test"></div>');
+      expect(outputContent).not.toContain('<span class="bdd-badge" data-feature="No Badge Test"></span>');
 
       // Restore console.warn
       console.warn = originalWarn;
@@ -236,7 +236,7 @@ describe('feature2markdown.js', () => {
       const outputContent = fs.readFileSync(outputFile, 'utf8');
       expect(outputContent).toContain('# Feature: Managing');
       expect(outputContent).toContain('Happy customer');
-      expect(outputContent).toContain('<div class="bdd-badge" data-feature="Managing"></div>');
+      expect(outputContent).toContain('<span class="bdd-badge" data-feature="Managing"></span>');
     });
   });
 });
