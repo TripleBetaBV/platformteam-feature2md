@@ -3,10 +3,11 @@
 //
 // This script converts Gherkin feature files to Markdown format with badges for each scenario.
 // It recursively searches for .feature files in the current directory and its subdirectories,
-// parses them, and appends a badge URL to each scenario name.
-// The badge URL is generated based on a provided badge service URL, feature name, and scenario name.
+// parses them, and appends a badge tag to each feature name and scenario name.
 //
-// Usage: node feature2markdown.js <badgeServiceUrl>
+// It is designed to be run from the command line and can be used in a CI/CD pipeline
+//
+// Usage: node feature2markdown.js
 // =============================================================
 import fs from 'fs';
 import path from 'path';
@@ -38,9 +39,9 @@ function getBadgeTag(featureName, scenarioName)
   }
 
   if (!scenarioName) {
-    return `<span class="bdd-badge" data-feature="${featureName}"></span>`;
+    return `<span class="bdd-badge-feature" data-feature="${featureName}"></span>`;
   }
-  return `<span class="bdd-badge" data-feature="${featureName}" data-scenario="${scenarioName}"></span>`;
+  return `<span class="bdd-badge-scenario" data-feature="${featureName}" data-scenario="${scenarioName}"></span>`;
 }
 
 // Zet een feature-bestand om naar Markdown met badges
@@ -80,35 +81,20 @@ function convertFeatureToMarkdown(featurePath) {
   console.log(`Converted and stored as: ${outPath}`);
 }
 
-// print process.argv
-function validateArgs() {
-  process.argv.forEach(function (val, index, array) {
-    // 1 commandline argument is required for the badge service URL
-    if (index === 2) {
-      if (!val.startsWith('http')) {
-        console.error('Badge service URL must start with http or https.');
-        process.exit(1);
-      }
-    }
-  });
-}
-
 function main() {
   const featureFiles = findFeatureFiles(process.cwd());
   if (featureFiles.length === 0) {
     console.log(`No .feature-files found in ${process.cwd()}.`);
   } else {
-    let badgeServiceUrl = process.argv[2];
-    featureFiles.forEach(featurePath => convertFeatureToMarkdown(featurePath, badgeServiceUrl));
+    featureFiles.forEach(featurePath => convertFeatureToMarkdown(featurePath));
     console.log(`${featureFiles.length} feature files converted.`);
   }
 }
 
 // Export functions for testing
-export { findFeatureFiles, getBadgeTag, convertFeatureToMarkdown, validateArgs, main };
+export { findFeatureFiles, getBadgeTag, convertFeatureToMarkdown, main };
 
 // Run main function only if this file is executed directly
 if (import.meta.url === `file://${process.argv[1]}`) {
-  validateArgs();
   main();
 }

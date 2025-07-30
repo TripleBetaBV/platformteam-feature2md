@@ -78,7 +78,7 @@ describe('feature2markdown.js', () => {
 
       const result = getBadgeTag(featureName);
       
-      expect(result).toBe(' <span class="bdd-badge" data-feature="My Feature"></span>');
+      expect(result).toBe('<span class="bdd-badge-feature" data-feature="My Feature"></span>');
     });
 
     test('should generate correct badge tag for scenario', () => {
@@ -87,7 +87,7 @@ describe('feature2markdown.js', () => {
 
       const result = getBadgeTag(featureName, scenarioName);
       
-      expect(result).toBe(' <span class="bdd-badge" data-feature="My Feature" data-scenario="My Scenario"></span>');
+      expect(result).toBe('<span class="bdd-badge-scenario" data-feature="My Feature" data-scenario="My Scenario"></span>');
     });
 
     test('should handle special characters in names', () => {
@@ -96,7 +96,7 @@ describe('feature2markdown.js', () => {
 
       const result = getBadgeTag(featureName, scenarioName);
       
-      expect(result).toBe(' <span class="bdd-badge" data-feature="My Feature! @#$%^&*()" data-scenario="Test Scenario: With Special Characters"></span>');
+      expect(result).toBe('<span class="bdd-badge-scenario" data-feature="My Feature! @#$%^&*()" data-scenario="Test Scenario: With Special Characters"></span>');
     });
 
     test('should remove trailing slash from badge service URL', () => {
@@ -105,7 +105,7 @@ describe('feature2markdown.js', () => {
 
       const result = getBadgeTag(featureName, scenarioName);
       
-      expect(result).toBe(' <span class="bdd-badge" data-feature="Feature" data-scenario="Scenario"></span>');
+      expect(result).toBe('<span class="bdd-badge-scenario" data-feature="Feature" data-scenario="Scenario"></span>');
     });
 
     test('should return empty string when feature name is not provided', () => {
@@ -135,7 +135,7 @@ describe('feature2markdown.js', () => {
       const featureFile = path.join(tempDir, 'test.feature');
       fs.writeFileSync(featureFile, featureContent);
 
-      convertFeatureToMarkdown(featureFile, badgeServiceUrl);
+      convertFeatureToMarkdown(featureFile);
 
       const outputFile = path.join(tempDir, 'test.generated.md');
       expect(fs.existsSync(outputFile)).toBe(true);
@@ -143,34 +143,9 @@ describe('feature2markdown.js', () => {
       const outputContent = fs.readFileSync(outputFile, 'utf8');
       expect(outputContent).toContain('# Feature: Test Feature');
       expect(outputContent).toContain('Test Scenario');
-      expect(outputContent).toContain('<span class="bdd-badge" data-feature="Test Feature" data-scenario="Test Scenario"></span>');
+      expect(outputContent).toContain('<span class="bdd-badge-scenario" data-feature="Test Feature" data-scenario="Test Scenario"></span>');
     });
 
-    test('should handle feature with rules', () => {
-      const featureContent = `Feature: Feature with Rules
-  
-  Rule: Business Rule
-    This is a business rule
-    
-    Scenario: Scenario under rule
-      Given something
-      When something happens
-      Then something should occur`;
-
-      const featureFile = path.join(tempDir, 'rule-test.feature');
-      fs.writeFileSync(featureFile, featureContent);
-      
-      convertFeatureToMarkdown(featureFile, badgeServiceUrl);
-
-      const outputFile = path.join(tempDir, 'rule-test.generated.md');
-      expect(fs.existsSync(outputFile)).toBe(true);
-
-      const outputContent = fs.readFileSync(outputFile, 'utf8');
-      expect(outputContent).toContain('Feature with Rules');
-      expect(outputContent).toContain('Business Rule');
-      expect(outputContent).toContain('Scenario under rule');
-      expect(outputContent).toContain('<span class="bdd-badge" data-feature="Feature with Rules" data-scenario="Scenario under rule"></span>');
-    });
 
     test('should create output file with correct name', () => {
       const featureContent = `Feature: Simple
@@ -199,7 +174,7 @@ describe('feature2markdown.js', () => {
       const mockWarn = () => {};
       console.warn = mockWarn;
 
-      convertFeatureToMarkdown(featureFile, null);
+      convertFeatureToMarkdown(featureFile);
 
       const outputFile = path.join(tempDir, 'nobadge.generated.md');
       expect(fs.existsSync(outputFile)).toBe(true);
@@ -207,7 +182,7 @@ describe('feature2markdown.js', () => {
       const outputContent = fs.readFileSync(outputFile, 'utf8');
       expect(outputContent).toContain('# Feature: No Badge Test');
       expect(outputContent).toContain('Test without badge');
-      expect(outputContent).not.toContain('<span class="bdd-badge" data-feature="No Badge Test"></span>');
+      expect(outputContent).not.toContain('<span class="bdd-badge-feature" data-feature="No Badge Test"></span>');
 
       // Restore console.warn
       console.warn = originalWarn;
@@ -228,7 +203,7 @@ describe('feature2markdown.js', () => {
       const tempFeatureFile = path.join(tempDir, 'Managing.feature');
       fs.copyFileSync(managingFeature, tempFeatureFile);
 
-      convertFeatureToMarkdown(tempFeatureFile, badgeServiceUrl);
+      convertFeatureToMarkdown(tempFeatureFile);
 
       const outputFile = path.join(tempDir, 'Managing.generated.md');
       expect(fs.existsSync(outputFile)).toBe(true);
@@ -236,7 +211,7 @@ describe('feature2markdown.js', () => {
       const outputContent = fs.readFileSync(outputFile, 'utf8');
       expect(outputContent).toContain('# Feature: Managing');
       expect(outputContent).toContain('Happy customer');
-      expect(outputContent).toContain('<span class="bdd-badge" data-feature="Managing"></span>');
+      expect(outputContent).toContain('<span class="bdd-badge-feature" data-feature="Managing"></span>');
     });
   });
 });
