@@ -1,0 +1,88 @@
+/*
+* This stylesheet works with the Bdd Badge Addon for Techdocs.
+* The value of the data-result attribute determines how the span is rendered.
+* Its value will be one of the values of the enum BddResult in the bbd-badges-common plugin:
+* Passed  - the feature or scenario has passed in the Azure Devops test results
+* Failed - the feature or scenario has failed in the Azure Devops test results
+* NotFound - the feature or scenario was not found in the Azure Devops test results
+* NoBuild - there was no build available to read the status from
+* Unknown - any other case
+*/
+
+/* Adds a small green check icon (SVG) after the title.  */
+.bdd-badge-feature[data-result="Passed"]::after,
+.bdd-badge-scenario[data-result="Passed"]::after {
+  content: 'Passed';
+  display: inline-block;
+  background: green;
+  color: black;
+  border-radius: 1em;
+  padding: 0.1em 0.7em;
+  font-size: 0.85em;
+  margin-left: 0.5em;
+  vertical-align: middle;
+  letter-spacing: 0.05em;
+}
+
+/* Adds a small red cross icon (SVG) after the title.  */
+.bdd-badge-feature[data-result='Failed']::after,
+.bdd-badge-scenario[data-result='Failed']::after {
+  content: 'Failed';
+  display: inline-block;
+  background: red;
+  color: white;
+  border-radius: 1em;
+  padding: 0.1em 0.7em;
+  font-size: 0.85em;
+  margin-left: 0.5em;
+  vertical-align: middle;
+  letter-spacing: 0.05em;
+}
+
+
+/* Adds a small red cross icon (SVG) after the title.  */
+.bdd-badge-feature[data-result='NotFound']::after,
+.bdd-badge-scenario[data-result='NotFound']::after {
+  content: 'Not found';
+  display: inline-block;
+  background: yellow;
+  color: black;
+  border-radius: 1em;
+  padding: 0.1em 0.7em;
+  font-size: 0.85em;
+  margin-left: 0.5em;
+  vertical-align: middle;
+  letter-spacing: 0.05em;
+}
+
+
+/* Dark gray label saying "No build"  */
+.bdd-badge-feature[data-result='NoBuild']::after,
+.bdd-badge-scenario[data-result='NoBuild']::after {
+  content: 'No build';
+  display: inline-block;
+  background: blue;
+  color: white;
+  border-radius: 1em;
+  padding: 0.1em 0.7em;
+  font-size: 0.85em;
+  margin-left: 0.5em;
+  vertical-align: middle;
+  letter-spacing: 0.05em;
+}
+
+
+/* Black badge saying unkown.  */
+.bdd-badge-feature[data-result='Unknown']::after,
+.bdd-badge-scenario[data-result='Unknown']::after {
+  content: 'Unknown';
+  display: inline-block;
+  background: #888;
+  color: white;
+  border-radius: 1em;
+  padding: 0.1em 0.7em;
+  font-size: 0.85em;
+  margin-left: 0.5em;
+  vertical-align: middle;
+  letter-spacing: 0.05em;
+}

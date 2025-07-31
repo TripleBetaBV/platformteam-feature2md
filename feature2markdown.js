@@ -39,9 +39,9 @@ function getBadgeTag(featureName, scenarioName)
   }
 
   if (!scenarioName) {
-    return ` <span class="bdd-badge-feature" data-feature="${featureName}"></span>`;
+    return `<span class="bdd-badge-feature" data-feature="${featureName}">${featureName}</span>`;
   }
-  return ` <span class="bdd-badge-scenario" data-feature="${featureName}" data-scenario="${scenarioName}"></span>`;
+  return `<span class="bdd-badge-scenario" data-feature="${featureName}" data-scenario="${scenarioName}">${scenarioName}</span>`;
 }
 
 // Zet een feature-bestand om naar Markdown met badges
@@ -58,15 +58,16 @@ function convertFeatureToMarkdown(featurePath) {
   
   // Add badge to the feature name
   const featureName = gherkinDocument.feature.name;
-  gherkinDocument.feature.name += getBadgeTag(featureName, null);
+//  gherkinDocument.feature.name += getBadgeTag(featureName, null);
+  gherkinDocument.feature.name = getBadgeTag(featureName, null);
 
   // Add badge to the scenario names
   for (const child of gherkinDocument.feature.children) {
     // Scenario directly under feature
     if (child.scenario) {
       console.log(`Adding badge to scenario: ${child.scenario.name}`);
-      const badge = getBadgeTag(featureName, child.scenario.name);
-      child.scenario.name += badge;
+//      child.scenario.name += getBadgeTag(featureName, child.scenario.name);
+      child.scenario.name = getBadgeTag(featureName, child.scenario.name);
       continue;
     }
 
@@ -75,15 +76,26 @@ function convertFeatureToMarkdown(featurePath) {
       console.log(`Processing scenarios under rule: ${child.rule.name}`);
       for (const scenarioUnderRule of child.rule.children) {
         console.log(`  Adding badge to scenario: ${scenarioUnderRule.scenario.name}`);
-        const badge = getBadgeTag(featureName, scenarioUnderRule.scenario.name);
-        scenarioUnderRule.scenario.name += badge;
+//        scenarioUnderRule.scenario.name += getBadgeTag(featureName, scenarioUnderRule.scenario.name);
+        scenarioUnderRule.scenario.name = getBadgeTag(featureName, scenarioUnderRule.scenario.name);
       }
     }
   }
 
+  // Save the converted Markdown to a new file
+  // At the top, add a style block for the badges
   const markdown = pretty(gherkinDocument, 'markdown');
   const outPath = featurePath.replace(/\.feature/, '.generated.md');
-  fs.writeFileSync(outPath, markdown);
+
+  // Read the full content of the small-badges.css file
+  const cssPath = path.join(path.dirname(import.meta.url.replace('file://', '')), 'styles', 'small-badges.css');
+  const cssContent = fs.readFileSync(cssPath, 'utf8');
+
+  // Add the CSS content to the top of the Markdown file
+  const cssBlock = `\`\`\`css\n${cssContent}\n\`\`\`\n\n`;
+  const markdownWithCss = cssBlock + markdown;  
+
+  fs.writeFileSync(outPath, markdownWithCss);
   console.log(`Converted and stored as: ${outPath}`);
 }
 
