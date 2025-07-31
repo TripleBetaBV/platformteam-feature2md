@@ -86,16 +86,7 @@ function convertFeatureToMarkdown(featurePath) {
   // At the top, add a style block for the badges
   const markdown = pretty(gherkinDocument, 'markdown');
   const outPath = featurePath.replace(/\.feature/, '.generated.md');
-
-  // Read the full content of the small-badges.css file
-  const cssPath = path.join(path.dirname(import.meta.url.replace('file://', '')), 'styles', 'small-badges.css');
-  const cssContent = fs.readFileSync(cssPath, 'utf8');
-
-  // Add the CSS content to the top of the Markdown file
-  const cssBlock = `<style>\n${cssContent}\n</style>\n\n`;
-  const markdownWithCss = cssBlock + markdown;  
-
-  fs.writeFileSync(outPath, markdownWithCss);
+  fs.writeFileSync(outPath, markdown);
   console.log(`Converted and stored as: ${outPath}`);
 }
 
