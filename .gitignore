@@ -1,6 +1,9 @@
 # macOS
 .DS_Store
 
+# output of this script
+*.generated.md
+
 # Logs
 logs
 *.log

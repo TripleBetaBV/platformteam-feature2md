@@ -39,9 +39,9 @@ function getBadgeTag(featureName, scenarioName)
   }
 
   if (!scenarioName) {
-    return `<span class="bdd-badge-feature" data-feature="${featureName}"></span>`;
+    return ` <span class="bdd-badge-feature" data-feature="${featureName}"></span>`;
   }
-  return `<span class="bdd-badge-scenario" data-feature="${featureName}" data-scenario="${scenarioName}"></span>`;
+  return ` <span class="bdd-badge-scenario" data-feature="${featureName}" data-scenario="${scenarioName}"></span>`;
 }
 
 // Zet een feature-bestand om naar Markdown met badges
@@ -56,22 +56,28 @@ function convertFeatureToMarkdown(featurePath) {
 
   console.log(`# items in feature: ${gherkinDocument.feature.children.length}`);
   
+  // Add badge to the feature name
+  const featureName = gherkinDocument.feature.name;
+  gherkinDocument.feature.name += getBadgeTag(featureName, null);
+
   // Add badge to the scenario names
   for (const child of gherkinDocument.feature.children) {
-    // Scenario nested under rule
-    if (child.rule) {
-      for (const scenario of child.rule.children) {
-        console.log(`Adding badge to scenario: ${scenario.scenario.name}`);
-        const badge = getBadgeTag(gherkinDocument.feature.name);
-        scenario.scenario.name += badge;
-      }
-    }
-
     // Scenario directly under feature
     if (child.scenario) {
       console.log(`Adding badge to scenario: ${child.scenario.name}`);
-      const badge = getBadgeTag(gherkinDocument.feature.name, child.scenario.name);
+      const badge = getBadgeTag(featureName, child.scenario.name);
       child.scenario.name += badge;
+      continue;
+    }
+
+    // Scenario nested under rule
+    if (child.rule) {
+      console.log(`Processing scenarios under rule: ${child.rule.name}`);
+      for (const scenarioUnderRule of child.rule.children) {
+        console.log(`  Adding badge to scenario: ${scenarioUnderRule.scenario.name}`);
+        const badge = getBadgeTag(featureName, scenarioUnderRule.scenario.name);
+        scenarioUnderRule.scenario.name += badge;
+      }
     }
   }
 
