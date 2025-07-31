@@ -143,7 +143,7 @@ describe('feature2markdown.js', () => {
       const outputContent = fs.readFileSync(outputFile, 'utf8');
 
       // Check that the CSS file is included at the start of the output
-      expect(outputContent.startsWith('```css')).toBe(true);
+      expect(outputContent.startsWith('<style>')).toBe(true);
       expect(outputContent).toContain('.bdd-badge-feature');
       expect(outputContent).toContain('# Feature: <span class="bdd-badge-feature" data-feature="Test Feature">Test Feature</span>');
       expect(outputContent).toContain('Test Scenario');

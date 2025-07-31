@@ -92,7 +92,7 @@ function convertFeatureToMarkdown(featurePath) {
   const cssContent = fs.readFileSync(cssPath, 'utf8');
 
   // Add the CSS content to the top of the Markdown file
-  const cssBlock = `\`\`\`css\n${cssContent}\n\`\`\`\n\n`;
+  const cssBlock = `<style>\n${cssContent}\n</style>\n\n`;
   const markdownWithCss = cssBlock + markdown;  
 
   fs.writeFileSync(outPath, markdownWithCss);
