@@ -84,7 +84,7 @@ function convertFeatureToMarkdown(featurePath) {
 
   // Save the converted Markdown to a new file
   // At the top, add a badge for the latest build
-  const latestBuildBadge = `<p style="text-align:right"><span class="bdd-badge-latestbuild">Build:</span></p>\n`;
+  const latestBuildBadge = `<p style="text-align:right"><span class="tooltip"><span class="bdd-badge-latestbuild">Build:</span></span></p>\n`;
   const markdown = pretty(gherkinDocument, 'markdown');
   const outPath = featurePath.replace(/\.feature/, '.generated.md');
   fs.writeFileSync(outPath, latestBuildBadge+markdown);
