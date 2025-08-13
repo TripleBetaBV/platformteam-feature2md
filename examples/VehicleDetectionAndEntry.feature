@@ -31,6 +31,7 @@ Feature: Vehicle Detection and Entry Control
     simultaneously to avoid collisions and ensure safety.
 
     Scenario: Second vehicle blocked when tunnel is occupied
+      # This is a line of comment
       Given a vehicle is currently in the wash tunnel
       When a second vehicle attempts to enter
       Then the entry should be blocked
@@ -38,7 +39,33 @@ Feature: Vehicle Detection and Entry Control
       And the second vehicle should wait until the tunnel is clear
 
     Scenario: Tunnel clear detection for next vehicle
+      # First comment line
+      # Second comment line
       Given a vehicle has completed the wash cycle and exited
       When the system detects the tunnel is clear
       Then the entry control should reset to ready state
       And the next vehicle should be allowed to enter
+
+  Scenario Outline: Communicate intent: communication channels
+    Given Intent with channels
+      | Channel | Determined |
+      | message | <Message>  |
+      | email   | <Email>    |
+      | letter  | <Letter>   |
+    When executing Communicate intent
+    And "Intent communicated" event "is" received
+    Then "Nothing sent" event "is not" received
+    And "Intent communicated as message" event "<Message>" received
+    And "Intent communicated as email" event "<Email>" received
+    And "Intent communicated as letter" event "<Letter>" received
+
+    Examples:
+      | Message | Email  | Letter  |
+      # | is      | is     | is      | Letter not yet implemented
+      # | is      | is not | is      | Letter not yet implemented
+      | is      | is not | is not  |
+      # | is      | is     | is not  | DocumentArchived correlation issues. Multiple channels wait for document-archived event but point to the same message. For that the reference needs to be set to a string instead of a guid.
+      # | is not  | is     | is      | Letter not yet implemented
+      | is not  | is     | is not  |
+      # | is not  | is not | is      | Letter not yet implemented
+

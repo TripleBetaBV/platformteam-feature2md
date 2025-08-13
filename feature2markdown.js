@@ -30,18 +30,45 @@ function findFeatureFiles(dir) {
   return results;
 }
 
-// Generate a tag for the badge, containing the name of the feature and scenario
-function getBadgeTag(featureName, scenarioName)
+// Generate a tag for the badge, containing the name of the feature, scenario or scenario outline
+function getBadgeTag(featureName, scenarioName, scenarioOutlineName)
 {
   if (!featureName) {
     console.warn('Feature name is required for badge generation.');
     return '';
   }
 
-  if (!scenarioName) {
-    return `<span class="bdd-badge-feature" data-feature="${featureName}">${featureName}</span>`;
+  if (scenarioName) {
+    return `<span class="bdd-badge-scenario" data-feature="${featureName}" data-scenario="${scenarioName}">${scenarioName}</span>`;
   }
-  return `<span class="bdd-badge-scenario" data-feature="${featureName}" data-scenario="${scenarioName}">${scenarioName}</span>`;
+
+  if (scenarioOutlineName) {
+    return `<span class="bdd-badge-scenario-outline" data-feature="${featureName}" data-scenario-outline="${scenarioOutlineName}">${scenarioOutlineName}</span>`;
+  }
+
+  return `<span class="bdd-badge-feature" data-feature="${featureName}">${featureName}</span>`;
+}
+
+// Handle Scenario Outline differently - you can customize the behavior here
+function handleScenarioOutline(scenario, featureName) {
+  console.log(`Processing Scenario Outline: ${scenario.name}`);
+  
+  // You can add custom logic here for scenario outlines
+  // For example, you might want to:
+  // 1. Add different styling/badges
+  // 2. Process the examples table differently
+  // 3. Generate badges for each example row
+  
+  if (scenario.examples && scenario.examples.length > 0) {
+    console.log(`  Found ${scenario.examples.length} examples table(s)`);
+    scenario.examples.forEach((exampleTable, index) => {
+      if (exampleTable.tableBody) {
+        console.log(`  Examples table ${index + 1} has ${exampleTable.tableBody.length} data rows`);
+      }
+    });
+  }
+  
+  return getBadgeTag(featureName, null, scenario.name);
 }
 
 // Zet een feature-bestand om naar Markdown met badges
@@ -65,9 +92,21 @@ function convertFeatureToMarkdown(featurePath) {
   for (const child of gherkinDocument.feature.children) {
     // Scenario directly under feature
     if (child.scenario) {
-      console.log(`Adding badge to scenario: ${child.scenario.name}`);
-//      child.scenario.name += getBadgeTag(featureName, child.scenario.name);
-      child.scenario.name = getBadgeTag(featureName, child.scenario.name);
+      // Check if this is a Scenario Outline by looking at the keyword
+      if (child.scenario.keyword && child.scenario.keyword.trim() === 'Scenario Outline') {
+        console.log(`Adding badge to scenario outline: ${child.scenario.name}`);
+        child.scenario.name = handleScenarioOutline(child.scenario, featureName);
+      } else {
+        console.log(`Adding badge to scenario: ${child.scenario.name}`);
+        child.scenario.name = getBadgeTag(featureName, child.scenario.name);
+      }
+      continue;
+    }
+
+    // Scenario Outline directly under feature (fallback, shouldn't be needed)
+    if (child.scenarioOutline) {
+      console.log(`Adding badge to scenario outline: ${child.scenarioOutline.name}`);
+      child.scenarioOutline.name = handleScenarioOutline(child.scenarioOutline, featureName);
       continue;
     }
 
@@ -75,9 +114,20 @@ function convertFeatureToMarkdown(featurePath) {
     if (child.rule) {
       console.log(`Processing scenarios under rule: ${child.rule.name}`);
       for (const scenarioUnderRule of child.rule.children) {
-        console.log(`  Adding badge to scenario: ${scenarioUnderRule.scenario.name}`);
-//        scenarioUnderRule.scenario.name += getBadgeTag(featureName, scenarioUnderRule.scenario.name);
-        scenarioUnderRule.scenario.name = getBadgeTag(featureName, scenarioUnderRule.scenario.name);
+        if (scenarioUnderRule.scenario) {
+          // Check if this is a Scenario Outline by looking at the keyword
+          if (scenarioUnderRule.scenario.keyword && scenarioUnderRule.scenario.keyword.trim() === 'Scenario Outline') {
+            console.log(`  Adding badge to scenario outline: ${scenarioUnderRule.scenario.name}`);
+            scenarioUnderRule.scenario.name = handleScenarioOutline(scenarioUnderRule.scenario, featureName);
+          } else {
+            console.log(`  Adding badge to scenario: ${scenarioUnderRule.scenario.name}`);
+            scenarioUnderRule.scenario.name = getBadgeTag(featureName, scenarioUnderRule.scenario.name);
+          }
+        } else if (scenarioUnderRule.scenarioOutline) {
+          console.log(`  Adding badge to scenario outline: ${scenarioUnderRule.scenarioOutline.name}`);
+          // Handle Scenario Outline under rule differently (fallback)
+          scenarioUnderRule.scenarioOutline.name = handleScenarioOutline(scenarioUnderRule.scenarioOutline, featureName);
+        }
       }
     }
   }
@@ -102,7 +152,7 @@ function main() {
 }
 
 // Export functions for testing
-export { findFeatureFiles, getBadgeTag, convertFeatureToMarkdown, main };
+export { findFeatureFiles, getBadgeTag, handleScenarioOutline, convertFeatureToMarkdown, main };
 
 main();
 

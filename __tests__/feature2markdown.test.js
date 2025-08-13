@@ -3,7 +3,8 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { 
   findFeatureFiles, 
-  getBadgeTag, 
+  getBadgeTag,
+  handleScenarioOutline,
   convertFeatureToMarkdown 
 } from '../feature2markdown.js';
 
@@ -188,6 +189,54 @@ describe('feature2markdown.js', () => {
       expect(outputContent).toContain('# Feature: Managing');
       expect(outputContent).toContain('Happy customer');
       expect(outputContent).toContain('<span class="bdd-badge-feature" data-feature="Managing">Managing</span>');
+    });
+  });
+
+  describe('handleScenarioOutline', () => {
+    test('should handle scenario outline differently than regular scenarios', () => {
+      const featureContent = `Feature: Test Feature with Scenario Outline
+
+  Scenario Outline: Test with examples
+    Given I have <count> items
+    When I add <more> items
+    Then I should have <total> items
+    
+    Examples:
+      | count | more | total |
+      | 1     | 2    | 3     |
+      | 5     | 3    | 8     |`;
+
+      const featureFile = path.join(tempDir, 'scenario-outline-test.feature');
+      fs.writeFileSync(featureFile, featureContent);
+
+      convertFeatureToMarkdown(featureFile);
+
+      const outputFile = path.join(tempDir, 'scenario-outline-test.generated.md');
+      expect(fs.existsSync(outputFile)).toBe(true);
+
+      const outputContent = fs.readFileSync(outputFile, 'utf8');
+      expect(outputContent).toContain('<span class="bdd-badge-feature" data-feature="Test Feature with Scenario Outline">Test Feature with Scenario Outline</span>');
+      expect(outputContent).toContain('Scenario Outline:');
+      expect(outputContent).toContain('bdd-badge-scenario-outline');
+      expect(outputContent).toContain('data-scenario-outline="Test with examples"');
+      expect(outputContent).toContain('Examples:');
+    });
+
+    test('should generate correct badge for scenario outline', () => {
+      const mockScenario = {
+        name: 'Test Scenario Outline',
+        keyword: 'Scenario Outline',
+        examples: [{
+          tableBody: [
+            { cells: [{ value: '1' }, { value: '2' }] },
+            { cells: [{ value: '3' }, { value: '4' }] }
+          ]
+        }]
+      };
+
+      const result = handleScenarioOutline(mockScenario, 'Test Feature');
+      
+      expect(result).toBe('<span class="bdd-badge-scenario-outline" data-feature="Test Feature" data-scenario-outline="Test Scenario Outline">Test Scenario Outline</span>');
     });
   });
 });
