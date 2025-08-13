@@ -6,6 +6,7 @@ import {
   getBadgeTag,
   handleScenarioOutline,
   filterOutComments,
+  fixTableFormatting,
   convertFeatureToMarkdown 
 } from '../feature2markdown.js';
 
@@ -314,6 +315,105 @@ As a user
       expect(outputContent).not.toContain('Another comment to be filtered');
       expect(outputContent).toContain('* Given I have something');
       expect(outputContent).toContain('* Then I should see result');
+    });
+  });
+
+  describe('fixTableFormatting', () => {
+    test('should remove indentation from tables to make valid Markdown tables', () => {
+      const markdownWithIndentedTables = `# Feature: Test
+## Scenario: Test with table
+* Given something
+  | Column1 | Column2 |
+  | ------- | ------- |
+  | Value1  | Value2  |
+* When something happens
+  | Header  | Data    |
+  | ------- | ------- |
+  | Test    | Result  |
+* Then something occurs`;
+
+      const result = fixTableFormatting(markdownWithIndentedTables);
+      
+      // Tables should be un-indented (no leading spaces)
+      expect(result).toContain('| Column1 | Column2 |');
+      expect(result).toContain('| ------- | ------- |');
+      expect(result).toContain('| Value1  | Value2  |');
+      expect(result).toContain('| Header  | Data    |');
+      expect(result).toContain('| Test    | Result  |');
+      
+      // Other content should remain unchanged
+      expect(result).toContain('# Feature: Test');
+      expect(result).toContain('* Given something');
+      expect(result).toContain('* When something happens');
+      expect(result).toContain('* Then something occurs');
+      
+      // Verify tables don't start with spaces
+      const lines = result.split('\n');
+      const tableLines = lines.filter(line => line.trim().startsWith('|') && line.trim().endsWith('|'));
+      tableLines.forEach(line => {
+        expect(line).not.toMatch(/^\s+\|/); // Should not start with spaces
+        expect(line).toMatch(/^\|/); // Should start with |
+      });
+    });
+
+    test('should handle scenario outline tables correctly', () => {
+      const featureContent = `Feature: Test Scenario Outline Tables
+
+  Scenario Outline: Test with data table
+    Given I have data
+      | Field   | Value     |
+      | name    | <Name>    |
+      | age     | <Age>     |
+    When I process it
+    Then I get <Result>
+    
+    Examples:
+      | Name  | Age | Result  |
+      | Alice | 25  | Success |
+      | Bob   | 30  | Success |`;
+
+      const featureFile = path.join(tempDir, 'table-test.feature');
+      fs.writeFileSync(featureFile, featureContent);
+
+      convertFeatureToMarkdown(featureFile);
+
+      const outputFile = path.join(tempDir, 'table-test.generated.md');
+      expect(fs.existsSync(outputFile)).toBe(true);
+
+      const outputContent = fs.readFileSync(outputFile, 'utf8');
+      
+      // Check that tables are properly formatted without indentation
+      expect(outputContent).toContain('| Field | Value  |');
+      expect(outputContent).toContain('| name  | <Name> |');
+      expect(outputContent).toContain('| Name  | Age | Result  |');
+      expect(outputContent).toContain('| Alice |  25 | Success |');
+      
+      // Verify no indented tables remain
+      const lines = outputContent.split('\n');
+      const indentedTableLines = lines.filter(line => /^\s+\|.*\|/.test(line));
+      expect(indentedTableLines).toHaveLength(0);
+    });
+
+    test('should preserve non-table content with pipes', () => {
+      const markdownWithPipes = `# Feature: Test
+## Scenario: Test with pipes in text
+* Given I have "option1|option2|option3"
+  | Column | Value |
+  | ------ | ----- |
+  | Test   | Data  |
+* When I process "value1|value2"
+* Then I should see the result`;
+
+      const result = fixTableFormatting(markdownWithPipes);
+      
+      // Table should be un-indented
+      expect(result).toContain('| Column | Value |');
+      expect(result).toContain('| ------ | ----- |');
+      expect(result).toContain('| Test   | Data  |');
+      
+      // Text with pipes should remain unchanged
+      expect(result).toContain('* Given I have "option1|option2|option3"');
+      expect(result).toContain('* When I process "value1|value2"');
     });
   });
 });

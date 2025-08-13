@@ -99,6 +99,36 @@ function filterOutComments(markdown) {
   return filteredLines.join('\n');
 }
 
+// Fix table formatting in markdown - remove indentation from tables
+function fixTableFormatting(markdown) {
+  const lines = markdown.split('\n');
+  const fixedLines = [];
+  let inTable = false;
+  
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const trimmed = line.trim();
+    
+    // Detect if this line looks like a table row (starts and ends with |)
+    const isTableRow = /^\s*\|.*\|\s*$/.test(line);
+    
+    if (isTableRow) {
+      inTable = true;
+      // Remove indentation from table rows to make them proper Markdown tables
+      fixedLines.push(trimmed);
+    } else {
+      if (inTable && trimmed !== '') {
+        // We were in a table but this line is not a table row and not empty
+        inTable = false;
+      }
+      // Keep the line as-is
+      fixedLines.push(line);
+    }
+  }
+  
+  return fixedLines.join('\n');
+}
+
 // Zet een feature-bestand om naar Markdown met badges
 function convertFeatureToMarkdown(featurePath) {
   console.log(`Processing: ${featurePath}`);
@@ -169,6 +199,9 @@ function convertFeatureToMarkdown(featurePath) {
   // We need to be careful not to remove markdown headings
   markdown = filterOutComments(markdown);
   
+  // Fix table formatting to ensure proper Markdown table rendering
+  markdown = fixTableFormatting(markdown);
+  
   const outPath = featurePath.replace(/\.feature/, '.generated.md');
   fs.writeFileSync(outPath, latestBuildBadge + markdown);
   console.log(`Converted and stored as: ${outPath}`);
@@ -185,7 +218,7 @@ function main() {
 }
 
 // Export functions for testing
-export { findFeatureFiles, getBadgeTag, handleScenarioOutline, filterOutComments, convertFeatureToMarkdown, main };
+export { findFeatureFiles, getBadgeTag, handleScenarioOutline, filterOutComments, fixTableFormatting, convertFeatureToMarkdown, main };
 
 main();
 
