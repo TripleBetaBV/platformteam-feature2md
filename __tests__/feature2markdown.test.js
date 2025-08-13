@@ -415,5 +415,67 @@ As a user
       expect(result).toContain('* Given I have "option1|option2|option3"');
       expect(result).toContain('* When I process "value1|value2"');
     });
+
+    test('should ensure proper table termination for Markdown parsers', () => {
+      const markdownEndingWithTable = `# Feature: Test
+## Scenario: Test ending with table
+* Given something
+| Column | Value |
+| ------ | ----- |
+| Test   | Data  |`;
+
+      const result = fixTableFormatting(markdownEndingWithTable);
+      
+      // Should add empty line after table that ends the document
+      expect(result).toMatch(/\|\s*Test\s*\|\s*Data\s*\|\s*\n\s*$/);
+      
+      // Should not have multiple empty lines at the end
+      expect(result).not.toMatch(/\n\n\n$/);
+    });
+
+    test('should handle multiple tables correctly', () => {
+      const markdownWithMultipleTables = `# Feature: Test
+## Scenario: Multiple tables
+* Given first table
+  | Col1 | Col2 |
+  | ---- | ---- |
+  | A    | B    |
+* When second action
+  | Col3 | Col4 |
+  | ---- | ---- |
+  | C    | D    |
+* Then result`;
+
+      const result = fixTableFormatting(markdownWithMultipleTables);
+      
+      // Both tables should be un-indented
+      expect(result).toContain('| Col1 | Col2 |');
+      expect(result).toContain('| Col3 | Col4 |');
+      
+      // Tables should be separated from following content
+      expect(result).toMatch(/\|\s*B\s*\|\s*\n\s*\*\s*When/);
+      expect(result).toMatch(/\|\s*D\s*\|\s*\n\s*\*\s*Then/);
+    });
+  });
+
+  describe('convertFeatureToMarkdown file ending', () => {
+    test('should ensure generated files end with newline', () => {
+      const featureContent = `Feature: Test ending
+  Scenario: Test
+    Given something
+    Then result`;
+
+      const featureFile = path.join(tempDir, 'ending-test.feature');
+      fs.writeFileSync(featureFile, featureContent);
+
+      convertFeatureToMarkdown(featureFile);
+
+      const outputFile = path.join(tempDir, 'ending-test.generated.md');
+      const outputContent = fs.readFileSync(outputFile, 'utf8');
+      
+      // File should end with newline
+      expect(outputContent).toMatch(/\n$/);
+      expect(outputContent.charCodeAt(outputContent.length - 1)).toBe(10); // newline character
+    });
   });
 });

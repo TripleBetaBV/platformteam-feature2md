@@ -119,11 +119,20 @@ function fixTableFormatting(markdown) {
     } else {
       if (inTable && trimmed !== '') {
         // We were in a table but this line is not a table row and not empty
+        // Add an empty line after the table to ensure proper separation
+        if (fixedLines.length > 0 && fixedLines[fixedLines.length - 1] !== '') {
+          fixedLines.push('');
+        }
         inTable = false;
       }
       // Keep the line as-is
       fixedLines.push(line);
     }
+  }
+  
+  // If we ended while still in a table, add an empty line
+  if (inTable && fixedLines.length > 0 && fixedLines[fixedLines.length - 1] !== '') {
+    fixedLines.push('');
   }
   
   return fixedLines.join('\n');
@@ -201,6 +210,11 @@ function convertFeatureToMarkdown(featurePath) {
   
   // Fix table formatting to ensure proper Markdown table rendering
   markdown = fixTableFormatting(markdown);
+  
+  // Ensure the file ends with a newline for proper Markdown parsing
+  if (!markdown.endsWith('\n')) {
+    markdown += '\n';
+  }
   
   const outPath = featurePath.replace(/\.feature/, '.generated.md');
   fs.writeFileSync(outPath, latestBuildBadge + markdown);
