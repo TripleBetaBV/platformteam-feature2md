@@ -104,7 +104,9 @@ function main() {
 // Export functions for testing
 export { findFeatureFiles, getBadgeTag, convertFeatureToMarkdown, main };
 
+main();
+
 // Run main function only if this file is executed directly
-if (import.meta.url === `file://${process.argv[1]}`) {
-  main();
-}
+//if (import.meta.url === `file://${process.argv[1]}`) {
+// main();
+//}
