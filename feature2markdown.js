@@ -71,6 +71,34 @@ function handleScenarioOutline(scenario, featureName) {
   return getBadgeTag(featureName, null, scenario.name);
 }
 
+// Filter out comment lines from markdown while preserving headings
+function filterOutComments(markdown) {
+  const lines = markdown.split('\n');
+  const filteredLines = lines.filter(line => {
+    const trimmed = line.trim();
+    
+    // Keep empty lines
+    if (trimmed === '') return true;
+    
+    // Keep all markdown headings (## or more #'s followed by space)
+    // This preserves headings but allows filtering of single # comments
+    if (/^#{2,}\s/.test(trimmed)) return true;
+    
+    // Special case: Keep the main feature heading (# Feature:)
+    if (/^#\s+Feature:/.test(trimmed)) return true;
+    
+    // Remove Gherkin comment lines (single # followed by space and text, not a Feature heading)
+    if (/^\s*#\s+/.test(line) && !/^#\s+Feature:/.test(trimmed)) {
+      return false;
+    }
+    
+    // Keep everything else (scenario steps, examples tables, etc.)
+    return true;
+  });
+  
+  return filteredLines.join('\n');
+}
+
 // Zet een feature-bestand om naar Markdown met badges
 function convertFeatureToMarkdown(featurePath) {
   console.log(`Processing: ${featurePath}`);
@@ -135,9 +163,14 @@ function convertFeatureToMarkdown(featurePath) {
   // Save the converted Markdown to a new file
   // At the top, add a badge for the latest build
   const latestBuildBadge = `<p style="text-align:right"><span class="bdd-badge-latestbuild-tooltip"><span class="bdd-badge-latestbuild"></span></span></p>\n`;
-  const markdown = pretty(gherkinDocument, 'markdown');
+  let markdown = pretty(gherkinDocument, 'markdown');
+  
+  // Remove comment lines (lines that start with # but are not headings)
+  // We need to be careful not to remove markdown headings
+  markdown = filterOutComments(markdown);
+  
   const outPath = featurePath.replace(/\.feature/, '.generated.md');
-  fs.writeFileSync(outPath, latestBuildBadge+markdown);
+  fs.writeFileSync(outPath, latestBuildBadge + markdown);
   console.log(`Converted and stored as: ${outPath}`);
 }
 
@@ -152,7 +185,7 @@ function main() {
 }
 
 // Export functions for testing
-export { findFeatureFiles, getBadgeTag, handleScenarioOutline, convertFeatureToMarkdown, main };
+export { findFeatureFiles, getBadgeTag, handleScenarioOutline, filterOutComments, convertFeatureToMarkdown, main };
 
 main();
 

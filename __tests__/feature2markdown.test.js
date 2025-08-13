@@ -5,6 +5,7 @@ import {
   findFeatureFiles, 
   getBadgeTag,
   handleScenarioOutline,
+  filterOutComments,
   convertFeatureToMarkdown 
 } from '../feature2markdown.js';
 
@@ -237,6 +238,82 @@ describe('feature2markdown.js', () => {
       const result = handleScenarioOutline(mockScenario, 'Test Feature');
       
       expect(result).toBe('<span class="bdd-badge-scenario-outline" data-feature="Test Feature" data-scenario-outline="Test Scenario Outline">Test Scenario Outline</span>');
+    });
+  });
+
+  describe('filterOutComments', () => {
+    test('should remove Gherkin comments while preserving headings', () => {
+      const markdownWithComments = `# Feature: Test Feature
+As a user
+
+## Scenario: Test scenario
+      # This is a comment that should be removed
+* Given something
+* When something happens
+      # Another comment to remove
+* Then something should occur
+
+### Examples:
+  | column |
+  | ------ |
+  | value  |
+      # Comment in examples should be removed`;
+
+      const result = filterOutComments(markdownWithComments);
+      
+      expect(result).toContain('# Feature: Test Feature');
+      expect(result).toContain('## Scenario: Test scenario');
+      expect(result).toContain('### Examples:');
+      expect(result).not.toContain('This is a comment that should be removed');
+      expect(result).not.toContain('Another comment to remove');
+      expect(result).not.toContain('Comment in examples should be removed');
+    });
+
+    test('should handle edge cases correctly', () => {
+      const edgeCaseMarkdown = `# Feature: Test Feature
+
+## Scenario: Edge cases
+* Given step
+# This is a comment
+* When step
+#### Sub-heading with 4 hashes
+# Another comment
+* Then step`;
+
+      const result = filterOutComments(edgeCaseMarkdown);
+      
+      expect(result).toContain('# Feature: Test Feature');
+      expect(result).toContain('## Scenario: Edge cases');
+      expect(result).toContain('#### Sub-heading with 4 hashes');
+      expect(result).not.toContain('This is a comment');
+      expect(result).not.toContain('Another comment');
+    });
+
+    test('should handle feature file with comments in scenarios', () => {
+      const featureContent = `Feature: Test with Comments
+
+  Scenario: Test scenario with comments
+    # This comment should not appear in output
+    Given I have something
+    When I do something
+    # Another comment to be filtered
+    Then I should see result`;
+
+      const featureFile = path.join(tempDir, 'comments-test.feature');
+      fs.writeFileSync(featureFile, featureContent);
+
+      convertFeatureToMarkdown(featureFile);
+
+      const outputFile = path.join(tempDir, 'comments-test.generated.md');
+      expect(fs.existsSync(outputFile)).toBe(true);
+
+      const outputContent = fs.readFileSync(outputFile, 'utf8');
+      expect(outputContent).toContain('Test with Comments');
+      expect(outputContent).toContain('Test scenario with comments');
+      expect(outputContent).not.toContain('This comment should not appear');
+      expect(outputContent).not.toContain('Another comment to be filtered');
+      expect(outputContent).toContain('* Given I have something');
+      expect(outputContent).toContain('* Then I should see result');
     });
   });
 });
